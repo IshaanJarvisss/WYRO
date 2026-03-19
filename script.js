@@ -1,76 +1,94 @@
-import { db, collection, addDoc, getDocs, onSnapshot } from "./firebase.js";
+import { db, collection, getDocs, onSnapshot, addDoc, updateDoc, doc } from "./firebase.js";
 
-// REGISTER
-window.register = async function () {
-  const real = document.getElementById("realName").value.trim();
-  const nick = document.getElementById("nickName").value.trim();
-
-  if (!real || !nick) {
-    alert("Fill all fields");
-    return;
-  }
-
-  // Check if already registered on this device
-  if (localStorage.getItem("registered")) {
-    alert("You have already registered on this device.");
-    return;
+// 1️⃣ Register user
+export async function registerPlayer(real, nick) {
+  if (localStorage.getItem("playerId")) {
+    return localStorage.getItem("playerId"); // already registered
   }
 
   // Check duplicate nickname
   const snapshot = await getDocs(collection(db, "players"));
   let duplicate = false;
-  snapshot.forEach(doc => {
-    if (doc.data().nickName.toLowerCase() === nick.toLowerCase()) duplicate = true;
+  snapshot.forEach(d => {
+    if (d.data().nickName.toLowerCase() === nick.toLowerCase()) duplicate = true;
   });
+  if (duplicate) throw new Error("Nickname already taken");
 
-  if (duplicate) {
-    alert("Nickname already taken!");
-    return;
-  }
+  const id = String(snapshot.size + 1).padStart(3, "0");
 
-  const id = String(snapshot.size + 1).padStart(3, '0');
-
-  await addDoc(collection(db, "players"), {
+  const docRef = await addDoc(collection(db, "players"), {
     realName: real,
     nickName: nick,
     playerId: id,
-    points: 1
+    events: {
+      "Speed Quiz": false,
+      "Puzzle Hunt": false,
+      "Trivia Race": false,
+      "Memory Challenge": false,
+      "Coding Sprint": false
+    },
+    points: 0
   });
 
-  localStorage.setItem("registered", "true");
   localStorage.setItem("playerId", id);
-  
-  // Redirect to thank you page
-  window.location.href = "thankyou.html";
-};
+  localStorage.setItem("docId", docRef.id); // save Firebase doc ID for future updates
+  return id;
+}
 
-// PARTICIPANTS
-window.loadParticipants = function () {
-  const list = document.getElementById("list");
+// 2️⃣ Register participation in an event
+export async function registerEvent(eventName) {
+  const docId = localStorage.getItem("docId");
+  if (!docId) throw new Error("Player not registered");
 
-  onSnapshot(collection(db, "players"), (snapshot) => {
-    list.innerHTML = "";
-    snapshot.forEach(doc => {
-      let p = doc.data();
-      list.innerHTML += `<p>${p.playerId} - ${p.nickName}</p>`;
+  const docRef = doc(db, "players", docId);
+  const snapshot = await getDocs(collection(db, "players"));
+  let playerData;
+
+  snapshot.forEach(d => {
+    if (d.id === docId) playerData = d.data();
+  });
+
+  if (!playerData) throw new Error("Player not found");
+
+  if (playerData.events[eventName]) {
+    alert("Already registered for this event");
+    return;
+  }
+
+  // Update event participation
+  await updateDoc(docRef, {
+    [`events.${eventName}`]: true,
+    points: playerData.points + 1
+  });
+
+  return true;
+}
+
+// 3️⃣ Load participants for an event
+export async function loadParticipants(eventName, containerId) {
+  const container = document.getElementById(containerId);
+  onSnapshot(collection(db, "players"), snapshot => {
+    container.innerHTML = "";
+    snapshot.forEach(d => {
+      const p = d.data();
+      if (p.events[eventName]) {
+        container.innerHTML += `<p>${p.playerId} - ${p.nickName}</p>`;
+      }
     });
   });
-};
+}
 
-// LEADERBOARD
-window.loadLeaderboard = function () {
-  const board = document.getElementById("leaderboard");
-
-  onSnapshot(collection(db, "players"), (snapshot) => {
+// 4️⃣ Load leaderboard
+export async function loadLeaderboard(containerId) {
+  const container = document.getElementById(containerId);
+  onSnapshot(collection(db, "players"), snapshot => {
     let players = [];
+    snapshot.forEach(d => players.push(d.data()));
+    players.sort((a,b)=> b.points - a.points);
 
-    snapshot.forEach(doc => players.push(doc.data()));
-
-    players.sort((a, b) => b.points - a.points);
-
-    board.innerHTML = "";
+    container.innerHTML = "";
     players.forEach(p => {
-      board.innerHTML += `<p>${p.playerId} - ${p.nickName} : ${p.points}</p>`;
+      container.innerHTML += `<p>${p.playerId} - ${p.nickName} : ${p.points}</p>`;
     });
   });
-};
+}
