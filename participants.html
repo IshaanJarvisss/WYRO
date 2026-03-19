@@ -4,14 +4,21 @@
   <title>Participants</title>
   <link rel="stylesheet" href="style.css">
 </head>
-<body onload="loadParticipants()">
-
+<body>
 <header>Participants</header>
+<div class="container" id="participantsContainer"></div>
 
-<div class="container">
-  <div class="card list" id="list"></div>
-</div>
+<script type="module">
+import { eventsList, loadParticipants } from "./script.js";
+const container=document.getElementById("participantsContainer");
 
-<script type="module" src="script.js"></script>
+eventsList.forEach(e=>{
+  const card=document.createElement("div");
+  card.className="card";
+  card.innerHTML=`<h3>${e}</h3><div id="list_${e.replace(/ /g,"_")}"></div>`;
+  container.appendChild(card);
+  loadParticipants(e, `list_${e.replace(/ /g,"_")}`);
+});
+</script>
 </body>
 </html>
