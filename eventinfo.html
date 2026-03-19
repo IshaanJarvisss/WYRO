@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Event Info</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>Event Info</header>
+<div class="container" id="eventsContainer"></div>
+
+<script>
+const events=["Speed Quiz","Puzzle Hunt","Trivia Race","Memory Challenge","Coding Sprint"];
+const container=document.getElementById("eventsContainer");
+
+events.forEach((e,i)=>{
+  const card=document.createElement("div");
+  card.className="card";
+  card.innerHTML=`<button onclick="goToDetails('${e}')">${e}</button>`;
+  container.appendChild(card);
+});
+
+window.goToDetails=function(eventName){
+  localStorage.setItem("selectedEvent", eventName);
+  window.location.href="eventdetails.html";
+}
+</script>
+</body>
+</html>
