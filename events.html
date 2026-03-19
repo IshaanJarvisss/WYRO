@@ -1,50 +1,28 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Events</title>
+  <title>Register for Event</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-<header>Event List</header>
-
+<header>Event Registration</header>
 <div class="container" id="eventsContainer"></div>
 
 <script type="module">
-const events = [
-  {name: "Speed Quiz", schedule: "Day 1, 2 PM", rules: "No cheating", about: "Fastest answers win"},
-  {name: "Puzzle Hunt", schedule: "Day 2, 4 PM", rules: "Team up", about: "Solve puzzles"},
-  {name: "Trivia Race", schedule: "Day 3, 3 PM", rules: "Answer quickly", about: "General knowledge"},
-  {name: "Memory Challenge", schedule: "Day 4, 1 PM", rules: "Single player", about: "Test your memory"},
-  {name: "Coding Sprint", schedule: "Day 5, 5 PM", rules: "Follow instructions", about: "Solve coding challenges"}
-];
+import { eventsList, registerEvent } from "./script.js";
 
 const container = document.getElementById("eventsContainer");
 
-events.forEach((e, index) => {
+eventsList.forEach((e,i)=>{
   const card = document.createElement("div");
-  card.className = "card";
-  card.innerHTML = `
-    <h3>${e.name}</h3>
-    <button onclick="showEvent(${index})">Event Info</button>
-  `;
+  card.className="card";
+  card.innerHTML=`<h3>${e}</h3><button id="btn${i}">Register</button>`;
   container.appendChild(card);
+  document.getElementById(`btn${i}`).onclick = async ()=>{
+    const success=await registerEvent(e);
+    if(success) window.location.href="thankyou.html";
+  };
 });
-
-window.showEvent = function(index) {
-  const e = events[index];
-  const infoCard = document.createElement("div");
-  infoCard.className = "card";
-  infoCard.innerHTML = `
-    <h3>${e.name} Details</h3>
-    <p><strong>Schedule:</strong> ${e.schedule}</p>
-    <p><strong>Rules:</strong> ${e.rules}</p>
-    <p><strong>About:</strong> ${e.about}</p>
-    <button onclick="this.parentElement.remove()">Back</button>
-  `;
-  container.appendChild(infoCard);
-};
 </script>
-
 </body>
 </html>
