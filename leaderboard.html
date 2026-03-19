@@ -4,14 +4,14 @@
   <title>Leaderboard</title>
   <link rel="stylesheet" href="style.css">
 </head>
-<body onload="loadLeaderboard()">
-
+<body onload="">
 <header>Leaderboard</header>
-
 <div class="container">
   <div class="card list" id="leaderboard"></div>
 </div>
-
-<script type="module" src="script.js"></script>
+<script type="module">
+import { loadLeaderboard } from "./script.js";
+loadLeaderboard("leaderboard");
+</script>
 </body>
 </html>
