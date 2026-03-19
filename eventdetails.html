@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Event Details</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header id="eventTitle"></header>
+<div class="container" id="eventDetails"></div>
+
+<script>
+const details={
+  "Speed Quiz": {schedule:"Day1 2PM", rules:"No cheating", about:"Fast answers win"},
+  "Puzzle Hunt": {schedule:"Day2 4PM", rules:"Team up", about:"Solve puzzles"},
+  "Trivia Race": {schedule:"Day3 3PM", rules:"Quick answers", about:"Knowledge test"},
+  "Memory Challenge": {schedule:"Day4 1PM", rules:"Single player", about:"Memory test"},
+  "Coding Sprint": {schedule:"Day5 5PM", rules:"Follow instructions", about:"Solve coding"}
+};
+
+const eventName=localStorage.getItem("selectedEvent");
+document.getElementById("eventTitle").innerText=eventName+" Details";
+
+const d=details[eventName];
+document.getElementById("eventDetails").innerHTML=`
+  <p><strong>Schedule:</strong> ${d.schedule}</p>
+  <p><strong>Rules:</strong> ${d.rules}</p>
+  <p><strong>About:</strong> ${d.about}</p>
+  <button onclick="window.location.href='eventinfo.html'">Back</button>
+  <button onclick="window.location.href='index.html'">Home</button>
+`;
+</script>
+</body>
+</html>
