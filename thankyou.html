@@ -1,19 +1,21 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Submitted</title>
+  <title>Thank You</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
 <header>Registration Submitted ✅</header>
-
 <div class="container">
   <div class="card">
     <p>Thank you for registering!</p>
-    <button onclick="window.location.href='events.html'">Go to Events</button>
+    <p>Your Player ID: <span id="playerId"></span></p>
+    <button onclick="window.location.href='index.html'">Back to Home</button>
   </div>
 </div>
 
+<script>
+document.getElementById("playerId").innerText = localStorage.getItem("playerId") || "N/A";
+</script>
 </body>
 </html>
